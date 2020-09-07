@@ -10,5 +10,6 @@ obj/
 /node_modules
 /wwwroot/node_modules
 .vs/
+launch.cmd
 
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore
