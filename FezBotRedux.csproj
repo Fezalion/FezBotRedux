@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <Folder Include="Modules\General\Info\" />
-    <Folder Include="Modules\Moderation\" />
     <Folder Include="Modules\Testing\" />
   </ItemGroup>
 
