@@ -24,6 +24,8 @@ namespace FezBotRedux.Common.Models
             optionsBuilder.UseSqlite("Data Source=EFCore.db");
         }
     }
+
+
     public class NeoHub
     {
         [Key]

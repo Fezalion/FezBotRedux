@@ -80,6 +80,7 @@ namespace FezBotRedux
             _client.Log += Log;
             _client.Ready += _client_Ready;
 
+            //aludgasuıldgajkldgquıkegjegqwhjke
 
             await Task.Delay(-1);
         }
