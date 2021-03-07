@@ -120,7 +120,7 @@ namespace FezBotRedux.Modules.Fun
                 var userlast = lastmessages.Where(x => !x.Content.Contains("e.") && x.Author != Context.Client.CurrentUser).FirstOrDefault(x => x.Author == user);
                 await Retard(userlast.Content);
             }
-            catch (NullReferenceException e)
+            catch (NullReferenceException)
             {
                 await NeoConsole.Log(LogSeverity.Error, "FunModule", "Error getting last messages of user, outofcache");
             }

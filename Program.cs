@@ -21,7 +21,6 @@ namespace FezBotRedux
     internal class Program
     {
         private static void Main() => new Program().Run().GetAwaiter().GetResult();
-
         private DiscordSocketClient _client;
         private IServiceProvider _services;
 
@@ -79,8 +78,6 @@ namespace FezBotRedux
 
             _client.Log += Log;
             _client.Ready += _client_Ready;
-
-            //aludgasuıldgajkldgquıkegjegqwhjke
 
             await Task.Delay(-1);
         }

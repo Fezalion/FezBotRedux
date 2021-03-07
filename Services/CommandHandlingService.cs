@@ -129,7 +129,8 @@ namespace FezBotRedux.Services
                 {
                     var newobj = new DbUser
                     {
-                        Id = msg.Author.Id
+                        Id = msg.Author.Id,
+                        Cash = 500
                     };
                     db.Users.Add(newobj);
                     db.SaveChanges();

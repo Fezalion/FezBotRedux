@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore.Proxies;
 using Microsoft.EntityFrameworkCore;
 using Discord.WebSocket;
 using System.Collections.Generic;
@@ -17,13 +18,48 @@ namespace FezBotRedux.Common.Models
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Playing> Playings { get; set; }
         public DbSet<NeoHub> NeoHubSettings { get; set; }
-
+        public DbSet<NeoBet> NeoBet { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        {            
             optionsBuilder.UseSqlite("Data Source=EFCore.db");
+            optionsBuilder.UseLazyLoadingProxies();
+            
         }
     }
+    public class NeoBet
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Identity { get; set; }        
+        public ulong msgID { get; set; }
+        public string BetName { get; set; }
+        public ulong ChannelId { get; set; }
+        public bool open { get; set; }
+        public virtual HashSet<Bet> Bets { get; set; } = new HashSet<Bet>();
+        public virtual HashSet<NeoBets> userBets { get; set; } = new HashSet<NeoBets>();
+    }
+
+    public class Bet
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Identity { get; set; }
+        public string BetName { get; set; }
+        public double BetRate { get; set; }
+    }
+
+    public class NeoBets
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Identity { get; set; }        
+        public virtual DbUser User { get; set; }
+        public int BetAmount { get; set; }
+        public int BetLoc { get; set; }
+    }
+
+
 
 
     public class NeoHub
@@ -41,7 +77,7 @@ namespace FezBotRedux.Common.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Identity { get; set; }
-        public DbUser User { get; set; }
+        public virtual DbUser User { get; set; }
         public DateTime Creation { get; set; }
         public string reason { get; set; }
     }
@@ -52,6 +88,16 @@ namespace FezBotRedux.Common.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Identity { get; set; }
         public ulong Id { get; set; }
+        public int Cash
+        {
+            get { return _cash; }
+            set
+            {
+                _cash = value;
+            }
+        }
+        [NotMapped]
+        public int _cash { get; set; }
     }
     public class Guild
     {
@@ -60,7 +106,7 @@ namespace FezBotRedux.Common.Models
         public int Identity { get; set; }
         public ulong Id { get; set; }
         public string Prefix { get; set; }
-        public Settings Settings { get; set; }
+        public virtual Settings Settings { get; set; }
     }
     public class Settings
     {
@@ -75,7 +121,7 @@ namespace FezBotRedux.Common.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Identity { get; set; }
-        public DbUser User { get; set; }
+        public virtual DbUser User { get; set; }
         public string Reason { get; set; }
         public DateTime Time { get; set; }
     }
@@ -85,8 +131,8 @@ namespace FezBotRedux.Common.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Identity { get; set; }
-        public DbUser Owner { get; set; }
-        public Guild Guild { get; set; }
+        public virtual DbUser Owner { get; set; }
+        public virtual Guild Guild { get; set; }
         public DateTime Creation { get; set; }
         public int Uses { get; set; }
         public string Trigger { get; set; }

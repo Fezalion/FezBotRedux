@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using Discord;
 using Discord.WebSocket;
 using FezBotRedux.Common.Models;
@@ -64,6 +66,44 @@ namespace FezBotRedux.Common.Extensions
                 },
                 Timestamp = DateTime.UtcNow
             };
+        }
+
+        public static EmbedBuilder Bet(string betname,HashSet<Bet> betset , int total_cash, string bets)
+        {
+            var embed = new EmbedBuilder
+            {
+                Color = new Color(0, 255, 0),
+                Author = new EmbedAuthorBuilder
+                {
+                    Name = betname
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Total bets: {total_cash}"
+                },
+                Timestamp = DateTime.UtcNow
+            };
+            foreach(var b in betset)
+            {
+                embed.AddField(x =>
+                {
+                    x.Name = b.BetName;
+                    x.Value = b.BetRate;
+                    x.IsInline = true;
+                });
+            }
+
+            if(!string.IsNullOrEmpty(bets))
+            {
+                embed.AddField(x =>
+                {
+                    x.Name = "Bets";
+                    x.Value = bets;
+                    x.IsInline = false;
+                });
+            }                     
+
+            return embed;
         }
 
         public static EmbedBuilder Error(string message, IUser u, string title = "Error")
