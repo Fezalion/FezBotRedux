@@ -23,8 +23,7 @@ namespace FezBotRedux.Modules.Fun {
             [Command("close"), Remarks("close the latest bet.")]
             public async Task CloseBet() {
                 using (var db = new NeoContext()) {
-                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) //if bet exist
-                    {
+                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) { //if bet exist
                         if (db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id).open) {
                             var obj = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
                             obj.open = false;
@@ -32,8 +31,7 @@ namespace FezBotRedux.Modules.Fun {
                             db.SaveChanges();
                             var embed = NeoEmbeds.Minimal($"Bet closed. Good luck!").Build();
                             await ReplyAsync("", false, embed);
-                        } else //already closed.
-                          {
+                        } else { //already closed.
                             var embed = NeoEmbeds.Error("Bet is already closed.", Context.User);
                             await ReplyAsync("", false, embed.Build());
                         }
@@ -63,7 +61,7 @@ namespace FezBotRedux.Modules.Fun {
                 using (var db = new NeoContext()) {
                     if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) {
                         var obj = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
-                        foreach (var loser in obj.userBets) {
+                        foreach (var loser in obj.userBets) { //TODO: Actually refund people lmao
                             if (loser.User.Cash < 500) {
                                 loser.User.Cash = 500;
                             }
@@ -100,23 +98,38 @@ namespace FezBotRedux.Modules.Fun {
                     }
                     var newlist = list.Where(x => x.Item2 > 0).OrderByDescending(x => x.Item2).ToList();
                     foreach (var i in newlist) {
-                        sb.Append($"**{i.Item1}** : {i.Item2}\n");
+                        sb.Append($"**{i.Item1}** : {i.Item2}₺\n");
                     }
                     var embed = NeoEmbeds.Minimal(sb.ToString());
                     await ReplyAsync("", false, embed.Build());
                 }
             }
 
+            [Command("award"), Remarks("Give cash"),Priority(1)]
+            [RequireOwner]
+            public async Task AwardCash([Summary("User to award cash")]IUser user, int cash) {
+                using (var db = new NeoContext()) {
+                    if(db.Users.Any(x=> x.Id == user.Id)) {
+                        var dbuser = db.Users.FirstOrDefault(uwu => uwu.Id == user.Id);
+                        dbuser.Cash += cash;
+                        db.Update(dbuser);
+                        db.SaveChanges();
+                        var embed = NeoEmbeds.Minimal($"{user.Username} have been awarded {cash}₺ by {Context.User.Username}.");
+                        await ReplyAsync("",false,embed.Build());
+                    } else {
+                        var embed = NeoEmbeds.Minimal("User not found.");
+                        await ReplyAsync("",false,embed.Build());
+                    }
+                }
+            }
+
             [Command("create", RunMode = RunMode.Async), Remarks("Create bet."), MinPermissions(AccessLevel.ServerAdmin)]
             public async Task CreateBet([Summary("The bet"), Remainder] string betname) {
                 using (var db = new NeoContext()) {
-                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) //there is a bet
-                    {
+                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) { //there is a bet
                         var embed = NeoEmbeds.Error("There is already a bet going.", Context.User);
                         await ReplyAsync("", false, embed.Build());
-                    }
-                    //Create bet
-                    else {
+                    } else { //Create bet
                         var tuples = new List<Tuple<string, double>>();
                         var count = 0;
                         double answer2 = 0.0;
@@ -124,15 +137,11 @@ namespace FezBotRedux.Modules.Fun {
                         var msg = await ReplyAsync("How many rates?");
                         var response = await NextMessageAsync(true, true, TimeSpan.FromSeconds(30));
 
-                        await msg.DeleteAsync();
-                        await response.DeleteAsync();
-
                         if (response != null) {
                             if (int.TryParse(response.Content, out count)) {
                                 if (count <= 0 || count >= 5) {
                                     await ReplyAndDeleteAsync("Please give a number either bigger than 0 or lower than 5.", false, null, TimeSpan.FromSeconds(5));
-                                } else // we gucci lets get the nay nays
-                                  {
+                                } else { // we gucci lets get the nay nays
                                     for (int index = 0; index < count; index++) {
                                         var old1 = await ReplyAsync($"Bet {index + 1}:");
                                         var response1 = await NextMessageAsync(true, true, TimeSpan.FromSeconds(30));
@@ -142,10 +151,9 @@ namespace FezBotRedux.Modules.Fun {
                                             if (response2 != null) {
                                                 if (double.TryParse(response2.Content, out answer2)) {
                                                     tuples.Add(new Tuple<string, double>(response1.Content, answer2));
-                                                    await old1.DeleteAsync();
-                                                    await old2.DeleteAsync();
-                                                    await response1.DeleteAsync();
-                                                    await response2.DeleteAsync();
+                                                    var messages = await Context.Channel.GetMessagesAsync( 20).FlattenAsync();
+                                                    messages = messages.Where(x => x.Id == msg.Id || x.Id == old1.Id || x.Id == old2.Id || x.Id == response.Id || x.Id == response1.Id || x.Id == response2.Id);
+                                                    await (Context.Channel as ITextChannel).DeleteMessagesAsync(messages);
                                                 } else {
                                                     await ReplyAndDeleteAsync("Please give a corrent number.", false, null, TimeSpan.FromSeconds(5));
                                                     await Task.CompletedTask;
@@ -202,17 +210,15 @@ namespace FezBotRedux.Modules.Fun {
             public async Task playBet([Summary("bet amount")] int cash, [Summary("bet")] int bet) {
                 var flag1 = false;
                 using (var db = new NeoContext()) {
-                    if (!db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) //no bet
-                    {
+                    if (!db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) { //no bet
                         var embed = NeoEmbeds.Error("There is no active bets.", Context.User);
                         await ReplyAsync("", false, embed.Build());
-                    } else if (!db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id).open)//closed bet
-                      {
+                    } else if (!db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id).open) {//closed bet
                         var embed = NeoEmbeds.Error("Bet is closed.", Context.User);
                         await ReplyAsync("", false, embed.Build());
                     } else //yes bet
                       {
-                        var uwu = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);// get bet
+                        var uwu = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
                         if (uwu.userBets?.Count > 0) {
                             foreach (var betto in uwu.userBets) {
                                 if (betto.User.Id == Context.User.Id) {
@@ -227,7 +233,7 @@ namespace FezBotRedux.Modules.Fun {
                         if (flag1 == false) {
                             var maxbet = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
                             var max = maxbet.Bets.Count;
-                            if (bet <= 0 || bet > max) { //düzgün oyna mq
+                            if (bet <= 0 || bet > max) { //thonk
                                 var embed = NeoEmbeds.Error("Wrong bet location.", Context.User);
                                 await ReplyAsync("", false, embed.Build());
                             } else {
@@ -265,8 +271,7 @@ namespace FezBotRedux.Modules.Fun {
             [Command("current"), Alias("c"), Remarks("get current bet")]
             public async Task getCurrentBet() {
                 using (var db = new NeoContext()) {
-                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) //there is a bet
-                    {
+                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) { //there is a bet
                         var obj = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
 
                         StringBuilder sb = new StringBuilder();
@@ -296,8 +301,7 @@ namespace FezBotRedux.Modules.Fun {
             [Command("finish"), Remarks("Finish the bet and award participants")]
             public async Task FinishBet([Summary("Winning Bet Index")] int winning_index) {
                 using (var db = new NeoContext()) {
-                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) //if bet
-                    {
+                    if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) { //if bet
                         var bet = db.NeoBet.FirstOrDefault(x => x.ChannelId == Context.Channel.Id);
                         var realbet = bet.Bets.ToArray()[winning_index - 1];
                         StringBuilder sb = new StringBuilder();
@@ -332,25 +336,6 @@ namespace FezBotRedux.Modules.Fun {
                         var embed = NeoEmbeds.Minimal($"**Winners**:\n {(!string.IsNullOrEmpty(winners) ? winners : "No one wins")}\n **Losers**:\n {(!string.IsNullOrEmpty(losers) ? losers : "No losers")}");
                         await ReplyAsync("", false, embed.Build());
                     }
-                }
-            }
-        }
-        public class LeagueOfOmer {
-            private Timer _lolCheckTimer = null;
-            private AutoResetEvent _autoEvent = null;
-            private RiotApi riot;
-            public LeagueOfOmer() {
-                _autoEvent = new AutoResetEvent(false);
-                _lolCheckTimer = new Timer(CheckLoLAsync, _autoEvent, 0, 1000 * 60 * 5);
-                //init rito api
-                riot = RiotApi.NewInstance("");
-            }
-            private async void CheckLoLAsync(object stateInfo) {
-                var game = await riot.SpectatorV4.GetCurrentGameInfoBySummonerAsync(Region.TR, "osshowcomeback");
-                //check for ömers accs
-                if (game != null) //live game poggers
-                {
-                    //todo shinenigans
                 }
             }
         }
