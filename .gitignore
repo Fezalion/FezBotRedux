@@ -12,4 +12,8 @@ obj/
 .vs/
 launch.cmd
 
+# uwu
+.vscode
+EFCore.db
+
 # End of https://www.toptal.com/developers/gitignore/api/dotnetcore
