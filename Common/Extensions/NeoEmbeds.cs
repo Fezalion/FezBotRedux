@@ -1,44 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using FezBotRedux.Common.Models;
 using FezBotRedux.Common.Types;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 
-namespace FezBotRedux.Common.Extensions
-{
-    public static class NeoEmbeds
-    {
-        public static EmbedBuilder Afk(string message, IUser u, string reason = null, string time = null, string title = "Away From Keyboard")
-        {
-            var embed = new EmbedBuilder
-            {
+namespace FezBotRedux.Common.Extensions {
+    public static class NeoEmbeds {
+        public static EmbedBuilder Afk(string message, IUser u, string reason = null, string time = null, string title = "Away From Keyboard") {
+            var embed = new EmbedBuilder {
                 Color = new Color(0, 255, 0),
                 Description = message,
-                Author = new EmbedAuthorBuilder
-                {
+                Author = new EmbedAuthorBuilder {
                     Name = title,
                     IconUrl = u.GetAvatarUrl()
                 },
                 Timestamp = DateTime.UtcNow
             };
-            if (!string.IsNullOrEmpty(reason))
-            {
-                embed.AddField(x =>
-                {
+            if (!string.IsNullOrEmpty(reason)) {
+                embed.AddField(x => {
                     x.Name = "Reason";
                     x.Value = reason;
                     x.IsInline = true;
                 });
             }
 
-            if (!string.IsNullOrEmpty(time))
-            {
-                embed.AddField(x =>
-                {
+            if (!string.IsNullOrEmpty(time)) {
+                embed.AddField(x => {
                     x.Name = "Time Left";
                     x.Value = time;
                     x.IsInline = true;
@@ -48,19 +38,15 @@ namespace FezBotRedux.Common.Extensions
             return embed;
         }
 
-        public static EmbedBuilder Success(string message, IUser u, string title = "Success")
-        {
-            return new EmbedBuilder
-            {
+        public static EmbedBuilder Success(string message, IUser u, string title = "Success") {
+            return new EmbedBuilder {
                 Color = new Color(0, 255, 0),
                 Description = message,
-                Author = new EmbedAuthorBuilder
-                {
+                Author = new EmbedAuthorBuilder {
                     Name = title,
                     IconUrl = "https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678134-sign-check-512.png"
                 },
-                Footer = new EmbedFooterBuilder
-                {
+                Footer = new EmbedFooterBuilder {
                     Text = $"Command executed by {u.Username}",
                     IconUrl = u.GetAvatarUrl()
                 },
@@ -68,57 +54,45 @@ namespace FezBotRedux.Common.Extensions
             };
         }
 
-        public static EmbedBuilder Bet(string betname,HashSet<Bet> betset , int total_cash, string bets)
-        {
-            var embed = new EmbedBuilder
-            {
+        public static EmbedBuilder Bet(string betname, HashSet<Bet> betset, int total_cash, string bets) {
+            var embed = new EmbedBuilder {
                 Color = new Color(0, 255, 0),
-                Author = new EmbedAuthorBuilder
-                {
+                Author = new EmbedAuthorBuilder {
                     Name = betname
                 },
-                Footer = new EmbedFooterBuilder
-                {
+                Footer = new EmbedFooterBuilder {
                     Text = $"Total bets: {total_cash}"
                 },
                 Timestamp = DateTime.UtcNow
             };
-            foreach(var b in betset)
-            {
-                embed.AddField(x =>
-                {
+            foreach (var b in betset) {
+                embed.AddField(x => {
                     x.Name = b.BetName;
                     x.Value = b.BetRate;
                     x.IsInline = true;
                 });
             }
 
-            if(!string.IsNullOrEmpty(bets))
-            {
-                embed.AddField(x =>
-                {
+            if (!string.IsNullOrEmpty(bets)) {
+                embed.AddField(x => {
                     x.Name = "Bets";
                     x.Value = bets;
                     x.IsInline = false;
                 });
-            }                     
+            }
 
             return embed;
         }
 
-        public static EmbedBuilder Error(string message, IUser u, string title = "Error")
-        {
-            return new EmbedBuilder
-            {
+        public static EmbedBuilder Error(string message, IUser u, string title = "Error") {
+            return new EmbedBuilder {
                 Color = new Color(255, 0, 0),
                 Description = message,
-                Author = new EmbedAuthorBuilder
-                {
+                Author = new EmbedAuthorBuilder {
                     Name = title,
                     IconUrl = "https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678069-sign-error-512.png"
                 },
-                Footer = new EmbedFooterBuilder
-                {
+                Footer = new EmbedFooterBuilder {
                     Text = $"Command executed by {u.Username}",
                     IconUrl = u.GetAvatarUrl()
                 },
@@ -126,21 +100,17 @@ namespace FezBotRedux.Common.Extensions
             };
         }
 
-        public static Embed Information(DiscordSocketClient c)
-        {
+        public static Embed Information(DiscordSocketClient c) {
             var prefix = Configuration.Load().Prefix;
             var owners = Configuration.Load().Owners;
             var users = owners.Select(own => c.GetUser(own).Username).ToList();
 
-            return new EmbedBuilder()
-            {
-                Author = new EmbedAuthorBuilder
-                {
+            return new EmbedBuilder() {
+                Author = new EmbedAuthorBuilder {
                     Name = "Information",
                     IconUrl = c.CurrentUser.GetAvatarUrl()
                 },
-                Footer = new EmbedFooterBuilder
-                {
+                Footer = new EmbedFooterBuilder {
                     Text = $"Refresh date "
                 },
                 Timestamp = DateTime.UtcNow,
@@ -163,33 +133,26 @@ namespace FezBotRedux.Common.Extensions
             }.Build();
         }
 
-        public static EmbedBuilder Log(string message, string eventName, string newmsg = null, string oldmsg = null)
-        {
-            var embed = new EmbedBuilder
-            {
+        public static EmbedBuilder Log(string message, string eventName, string newmsg = null, string oldmsg = null) {
+            var embed = new EmbedBuilder {
                 Color = new Color(255, 0, 0),
                 Title = message,
-                Footer = new EmbedFooterBuilder
-                {
+                Footer = new EmbedFooterBuilder {
                     Text = $":zap: {eventName}"
                 },
                 Timestamp = DateTime.UtcNow
             };
 
-            if (oldmsg != null)
-            {
-                embed.AddField(x =>
-                {
+            if (oldmsg != null) {
+                embed.AddField(x => {
                     x.Name = "Old";
                     x.Value = oldmsg;
                     x.IsInline = false;
                 });
             }
 
-            if (newmsg != null)
-            {
-                embed.AddField(x =>
-                {
+            if (newmsg != null) {
+                embed.AddField(x => {
                     x.Name = oldmsg == null ? "Deleted Message" : "New";
                     x.Value = newmsg;
                     x.IsInline = false;
@@ -199,10 +162,8 @@ namespace FezBotRedux.Common.Extensions
             return embed;
         }
 
-        public static EmbedBuilder Minimal(string message)
-        {
-            var embed = new EmbedBuilder
-            {
+        public static EmbedBuilder Minimal(string message) {
+            var embed = new EmbedBuilder {
                 Color = new Color(255, 0, 0),
                 Title = message
             };
@@ -210,10 +171,8 @@ namespace FezBotRedux.Common.Extensions
             return embed;
         }
 
-        public static EmbedBuilder TagStats(string username, Tag t)
-        {
-            var embed = new EmbedBuilder
-            {
+        public static EmbedBuilder TagStats(string username, Tag t) {
+            var embed = new EmbedBuilder {
                 Color = new Color(255, 255, 255),
                 Title = $"Stats of `{t.Trigger}`"
             };
@@ -247,13 +206,10 @@ namespace FezBotRedux.Common.Extensions
             return embed;
         }
 
-        public static Embed Picture(string objValue, IUser u)
-        {
-            return new EmbedBuilder
-            {
+        public static Embed Picture(string objValue, IUser u) {
+            return new EmbedBuilder {
                 ImageUrl = objValue,
-                Footer = new EmbedFooterBuilder
-                {
+                Footer = new EmbedFooterBuilder {
                     Text = $"Tag executed by {u.Username}",
                     IconUrl = u.GetAvatarUrl()
                 },

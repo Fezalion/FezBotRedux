@@ -1,11 +1,9 @@
-﻿namespace FezBotRedux.Common.Enums
-{
+﻿namespace FezBotRedux.Common.Enums {
     /// <summary>
     /// The enum used to specify permission levels. A lower
     /// number means less permissions than a higher number.
     /// </summary>
-    public enum AccessLevel
-    {
+    public enum AccessLevel {
         Blocked,
         User,
         ServerMod,

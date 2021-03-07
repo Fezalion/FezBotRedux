@@ -1,36 +1,31 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Discord.Commands;
+﻿using Discord.Commands;
 using Discord.WebSocket;
 using FezBotRedux.Common.Enums;
 using FezBotRedux.Common.Types;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace FezBotRedux.Common.Attributes
-{
+namespace FezBotRedux.Common.Attributes {
     /// <summary>
     /// Set the minimum permission required to use a module or command
     /// similar to how MinPermissions works in Discord.Net 0.9.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
-    public class MinPermissionsAttribute : PreconditionAttribute
-    {
+    public class MinPermissionsAttribute : PreconditionAttribute {
         private readonly AccessLevel _level;
 
-        public MinPermissionsAttribute(AccessLevel level)
-        {
+        public MinPermissionsAttribute(AccessLevel level) {
             _level = level;
         }
 
-        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services)
-        {
+        public override Task<PreconditionResult> CheckPermissionsAsync(ICommandContext context, CommandInfo command, IServiceProvider services) {
             var access = GetPermission(context);            // Get the acccesslevel for this context
 
             return Task.FromResult(access >= _level ? PreconditionResult.FromSuccess() : PreconditionResult.FromError("Insufficient permissions."));
         }
 
-        private static AccessLevel GetPermission(ICommandContext c)
-        {
+        private static AccessLevel GetPermission(ICommandContext c) {
             if (c.User.IsBot)                                    // Prevent other bots from executing commands.
                 return AccessLevel.Blocked;
 
