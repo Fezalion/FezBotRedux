@@ -170,19 +170,7 @@ namespace FezBotRedux.Modules.General {
                 x.Name = "Uptime";
                 x.Value = Thing(GetUptime());
                 x.IsInline = true;
-            });
-
-            builder.AddField(x => {
-                x.Name = "Memory Usage";
-                x.Value = GetHeapSize() + " MB(s) / " + GetTotalMemSize() + " MB(s)";
-                x.IsInline = true;
-            });
-
-            builder.AddField(x => {
-                x.Name = "Host Information";
-                x.Value = GetHwData();
-                x.IsInline = true;
-            });
+            });            
 
             builder.AddField(x => {
                 x.Name = "Details";
@@ -197,21 +185,5 @@ namespace FezBotRedux.Modules.General {
         private static TimeSpan GetUptime()
             => (DateTime.Now - Process.GetCurrentProcess().StartTime);
         private static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString(CultureInfo.InvariantCulture);
-
-        [DllImport("kernel32.dll")]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool GetPhysicallyInstalledSystemMemory(out long totalMemoryInKilobytes);
-
-        private static string GetTotalMemSize() {
-            GetPhysicallyInstalledSystemMemory(out var memkb);
-            return Math.Round(memkb / (1024.0), 2).ToString("0,000");
-        }
-
-        private static string GetHwData() {
-            GetPhysicallyInstalledSystemMemory(out var mem);
-            return "Cores : " + Environment.ProcessorCount + "\n"
-                    + "Name : " + Environment.MachineName + "\n"
-                    + "Memory : " + Math.Round(mem / (1024.0 * 1024.0), 2) + "GB(s)\n";
-        }
     }
 }

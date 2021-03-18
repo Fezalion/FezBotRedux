@@ -123,7 +123,7 @@ namespace FezBotRedux.Modules.Fun {
                 }
             }
 
-            [Command("create", RunMode = RunMode.Async), Remarks("Create bet."), MinPermissions(AccessLevel.ServerAdmin)]
+            [Command("create", RunMode = RunMode.Async), Remarks("Create bet.")]
             public async Task CreateBet([Summary("The bet"), Remainder] string betname) {
                 using (var db = new NeoContext()) {
                     if (db.NeoBet.Any(x => x.ChannelId == Context.Channel.Id)) { //there is a bet

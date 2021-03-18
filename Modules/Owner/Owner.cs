@@ -87,6 +87,41 @@ namespace FezBotRedux.Modules.Owner {
             return m.Id;
         }
 
+        [Command("dervis")]
+        [Remarks("Kills the dervis process.")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task KillDevisProcess() {
+            var guild = Context.Client.Guilds.FirstOrDefault(x => x.Name.Contains("Anne"));
+            if (guild != null) {
+                var embed = NeoEmbeds.Minimal($"Found Guild : {guild.Name}");
+                await ReplyAsync("", false, embed.Build());
+
+                var role1 = guild.Roles.FirstOrDefault(x => x.Name.Contains("Uzay Asla"));
+                if (role1 != null) {
+                    var embed2 = NeoEmbeds.Minimal($"Found Role : {role1.Name}");
+                    await ReplyAsync("", false, embed2.Build());
+
+                    var role2 = guild.Roles.FirstOrDefault(x => x.Name.Contains("malaz"));
+                    if (role2 != null) {
+                        var embed4 = NeoEmbeds.Minimal($"Found Role : {role2.Name}");
+                        await ReplyAsync("", false, embed4.Build());
+
+                        await role1.ModifyAsync(x => x.Position = 1);
+
+                    } else {
+                        var embed3 = NeoEmbeds.Minimal("can't find köylü role");
+                        await ReplyAsync("", false, embed3.Build());
+                    }
+                } else {
+                    var embed2 = NeoEmbeds.Minimal("can't find master role");
+                    await ReplyAsync("", false, embed2.Build());
+                }
+            } else {
+                var embed = NeoEmbeds.Minimal("can't find guild");
+                await ReplyAsync("", false, embed.Build());
+            }
+        }
+
         [Command("die")]
         [Remarks("Kills the bot process.")]
         [MinPermissions(AccessLevel.BotOwner)]
