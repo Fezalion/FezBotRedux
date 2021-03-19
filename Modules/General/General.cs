@@ -179,6 +179,11 @@ namespace FezBotRedux.Modules.General {
                 x.IsInline = true;
             });
 
+            builder.AddField(x => {
+                x.Name = "Memory";
+                x.Value = GetHeapSize();
+                x.IsInline = true;
+            });
             await ReplyAsync("", false, builder.Build());
         }
 
