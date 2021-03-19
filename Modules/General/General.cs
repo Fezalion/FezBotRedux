@@ -180,8 +180,8 @@ namespace FezBotRedux.Modules.General {
             });
 
             builder.AddField(x => {
-                x.Name = "Memory";
-                x.Value = GetHeapSize();
+                x.Name = "Memory Usage";
+                x.Value = GetHeapSize() + " MB(s) / " + GetTotalMemSize() + " MB(s)";
                 x.IsInline = true;
             });
             await ReplyAsync("", false, builder.Build());
@@ -190,5 +190,6 @@ namespace FezBotRedux.Modules.General {
         private static TimeSpan GetUptime()
             => (DateTime.Now - Process.GetCurrentProcess().StartTime);
         private static string GetHeapSize() => Math.Round(GC.GetTotalMemory(true) / (1024.0 * 1024.0), 2).ToString(CultureInfo.InvariantCulture);
+        private static string GetTotalMemSize() => Math.Round(GC.GetGCMemoryInfo().TotalAvailableMemoryBytes / 1048576.0).ToString(CultureInfo.InvariantCulture);
     }
 }
