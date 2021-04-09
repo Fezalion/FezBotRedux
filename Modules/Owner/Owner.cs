@@ -87,6 +87,26 @@ namespace FezBotRedux.Modules.Owner {
             return m.Id;
         }
 
+        [Command("delemotes")]
+        [Remarks("deletes all emotes")]
+        [MinPermissions(AccessLevel.BotOwner)]
+        public async Task DelEmotes() {
+            var guild = Context.Guild;
+            var emotes = guild.Emotes;
+            var count = 0;
+
+            var embed2 = NeoEmbeds.Minimal($"Deleting emotes...");
+            await ReplyAsync("", false, embed2.Build());
+
+            foreach (var emote in emotes) {
+                await guild.DeleteEmoteAsync(emote);                
+                count++;
+            }
+
+            var embed = NeoEmbeds.Minimal($"Deleted {count} emotes.");
+            await ReplyAsync("", false, embed.Build());
+        }
+
         [Command("dervis")]
         [Remarks("Kills the dervis process.")]
         [MinPermissions(AccessLevel.BotOwner)]
